@@ -511,8 +511,7 @@ for room in classroom.get_classroom_list():
     for course in class_dict:
         for _class_ in class_dict[course]["classes"]:
             if _class_["class"][0][4] == room:
-                classroom_dict[room]["classes"][course] = _class_["class"]
-
+                classroom_dict[room]["classes"][course] = class_dict[course]["classes"]
 sort_course = {}
 
 def add_course_to_class():
