@@ -312,7 +312,7 @@ they need to register in the semester
 """
 
 
-# Tập C chứa các nhóm lớp, đi cùng với các mã lớp mà nhóm lớp đó sẽ học trong kỳ
+# Tập Cg chứa các nhóm lớp, đi cùng với các mã lớp mà nhóm lớp đó sẽ học trong kỳ
 def Cg_set():
     Cg_set = {}
 
@@ -450,11 +450,12 @@ for sess in session_list:
         unique_session_list.append(sess)
         
 session_list = unique_session_list
-
+''' Tập session_set chứa tất cả các bộ tiết học trên một buổi học có thể xảy ra'''
+# Lấy các hoán vị của bộ các tiết học của mỗi mã lớp có thể học 
 session_set = []
 for n in range(1, 4):
    session_set += list(itertools.permutations(session_list, n))
-
+# Nếu như tổng số tiết của bộ các tiết đó lớn hơn sau thì loại bộ đó 
 for i in range(8):
    for check_session in session_set:
        if len(check_session) == 1:
@@ -469,60 +470,141 @@ for i in range(8):
                if check_session[0][1] - check_session[0][0] + check_session[1][1] - check_session[1][0] + check_session[2][1] - check_session[2][0] > 6: 
                    session_set.remove(check_session)
                break
+# Nếu tiết đầu tiên của tiết sau nhỏ hơn hoặc bằng tiết đầu tiên của tiết trước thì loại bộ đó 
 for i in range(8):
    for check_session in session_set:
        if len(check_session) == 1:
            pass
        elif len(check_session) == 2:
            for i in range(8):
-               if check_session[0][0] >= check_session[1][0]:
+               if check_session[0][0] > check_session[1][0]:
                    session_set.remove(check_session)
                break
        elif len(check_session) == 3:
            for i in range(8):
-               if check_session[0][0] >= check_session[1][0] or check_session[0][0] >= check_session[2][0] or check_session[1][0] >= check_session[2][0]:
+               if check_session[0][0] > check_session[1][0] or check_session[0][0] > check_session[2][0] or check_session[1][0] >= check_session[2][0]:
                    session_set.remove(check_session)
                break
+# Nếu tiết đầu tiên của tiết sau nhỏ hơn tiết cuối cùng của tiết trước thì loại bộ đó 
 for i in range(8):
     for check_different in session_set:
         if len(check_different) == 1:
             pass
         elif len(check_different) == 2:
             for i in range(8):
-                if check_different[0][1] != check_different[1][0]:
+                if check_different[0][1] > check_different[1][0]:
                     session_set.remove(check_different)
                 break
         elif len(check_different) == 3:
             for i in range(8):
-                if check_different[0][1] != check_different[1][0] or check_different[1][1] != check_different[2][0]:
+                if check_different[0][1] > check_different[1][0] or check_different[1][1] > check_different[2][0]:
                     session_set.remove(check_different)
                 break
-
+# Nếu bộ 2 tiết nằm trong bộ 3 tiết thì loại bộ 2 tiết đó 
+for i in range(4):
+    for check_distance in session_set:
+        if len(check_distance) == 2:
+            if check_distance[0] in session_set[-1] and check_distance[1] in session_set[-1]:
+                session_set.remove(check_distance)
+                break
+# Chuyển thành list
 for i in range(len(session_set)):
-    session_set[i] = set(session_set[i])
-    
-''' Tạo ra dict với key là phòng học, bên trong là dict con chứa các lớp học ở phòng học đó, dict con có key là 
-lớp đó '''
+    session_set[i] = list(session_set[i])
+# Loại bỏ các bộ chỉ có một phần tử (do số tiết nhỏ hơn hoặc bằng 4 nên một buổi sẽ luôn ít nhất có 2 tiết)
+for i in range(4):
+    for session_i in session_set:
+        if len(session_i) == 1:
+            session_set.remove(session_i)
+''' Tạo ra dict với key là phòng học, bên trong là dict con chứa các lớp học ở phòng học đó, số tiết 
+mỗi buổi mà phòng đó có thể xếp và phòng học đó đã xếp đủ chỗ hay chưa'''
+classroom_slots = {}
+for room in classroom.get_classroom_list():
+    classroom_slots[room] = {1: {"used_by": [], "session set": []}, 2: {"used_by": [], "session set": []}, 3: {"used_by": [], "session set": []}, 4: {"used_by": [], "session set": []}, 5: {"used_by": [], "session set": []}, 6: {"used_by": [], "session set": []}, 7: {"used_by": [], "session set": []}, 8: {"used_by": [], "session set": []}, 9: {"used_by": [], "session set": []}, 10: {"used_by": [], "session set": []}}
+
 classroom_dict = {}
 for room in classroom.get_classroom_list():
-    classroom_dict[room] = {"classes": {}, "full": False}
+    classroom_dict[room] = {"classes": {}, "slots": classroom_slots[room]}
 
 for room in classroom.get_classroom_list():
     for course in class_dict:
         for _class_ in class_dict[course]["classes"]:
             if _class_["class"][0][4] == room:
                 classroom_dict[room]["classes"][course] = []
-                
+
 for room in classroom.get_classroom_list():
     for course in class_dict:
         for _class_ in class_dict[course]["classes"]:
             if _class_["class"][0][4] == room:
                 classroom_dict[room]["classes"][course].append(_class_)
-                
-sort_course = {}
 
-def add_course_to_class():
-    pass
+""" 1. Xét các nhóm phòng học theo sức chứa.
+    2. Lấy ra các mã lớp sẽ sử dụng nhóm phòng học đó.
+    3. Xếp lần lượt các mã lớp vào các phòng học:
+        3.1. Xếp lần lượt từng phòng, từng buổi một phòng, cho đến khi tất cả các 
+             buổi của phòng học đó đã đầy (so sánh mỗi buổi với session_set)
+        3.2. Khi một phòng đầy thì chuyển sang phòng tiếp theo trong nhóm phòng 
+             học có cùng sức chứa với phòng đó.
+        3.3. Nếu như khi xếp hết các buổi của tất cả các phòng trong nhóm phòng học đó
+             mà vẫn còn lớp chưa được xếp thì lớp đó sẽ được lưu vào một danh sách 
+             khác để sử dụng một nhóm phòng khác còn trống phòng.
+    4. Sau khi đã xếp hết lớp ứng với một nhóm phòng mà nhóm phòng đó vẫn còn thừa chỗ
+       thì những phòng còn chỗ sẽ được lưu vào một danh sách khác.
+    5. Xếp những lớp chưa được xếp vào các phòng còn chỗ trống và phù hợp về sức chứa
+       cũng như sĩ số lớp đó.
+    6. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu
+       có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ). """
+       
+# # Danh sách các phòng đã được xếp đầy chỗ 
+# used_room = []
+
+# # Lấy ra nhóm phòng cùng cỡ và nhóm lớp học các phòng đó 
+# def get_room_set(capacity):
+#     room_set = R_set[capacity]
+#     return room_set
+
+# def get_class_take_part_in(room_set):
+#     class_take_part_in = []
+#     for _class_ in classroom_dict[room_set[0]]["classes"].keys():
+#         class_take_part_in.append(_class_)
+#     return class_take_part_in 
+
+# # Kiểm tra xem một buổi của một lớp nào đó đã đầy hay chưa
+# def session_is_full(room, sess_num):
+#     return room["slots"][sess_num] in session_set 
+        
+# # Kiểm tra xem một phòng học trong một nhóm phòng nào đó đã xếp đầy hay chưa 
+# def room_is_full(room, day_full):
+#     return day_full == 10
+
+# # Thêm mã lớp vào một phòng 
+# def add_course_to_room(room_set, class_take_part_in):
+#     for room in room_set:
+#         # Danh sách chứa các buổi của một phòng nếu buổi đó đã xếp đầy
+#         day_full = []
+#         # Nếu phòng đó chưa xếp đầy tất cả các buổi thì tiếp tục xếp 
+#         if not room_is_full(room, day_full):
+#             for i in range(1, 11):
+#                 # Nếu một buổi chưa đầy thì tiếp tục xếp vào buổi đó 
+#                 if not session_is_full(room, i):
+#                     for __class__ in class_take_part_in:
+#                         room["slots"][i]["used_by"].append(__class__)
+#                         room["slots"][i]["session set"].append((classroom_dict[room_set[0]]["classes"][__class__]))
+            
+        
+# # Kiểm tra xem lớp con có bị trùng tiết với lớp ghép hay không
+
+# # Kiểm tra xem đã hết phòng sử dụng hay chưa 
+# def out_of_room(room):
+#     global day_full
+#     if room_is_full(room, day_full) not in used_room:
+#         used_room.append(room)
+#     return used_room == 34
+# # Xếp lớp
+# def sort_timetable():
+#     i = 0
+#     while not out_of_room:
+#         pass
+    
 # expected_timetable = {'Mã lớp': A_set,
 #                       'Lớp tham gia': g_set,
 #                       'Mã_HP': credit_code_list,
