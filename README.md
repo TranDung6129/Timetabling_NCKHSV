@@ -78,13 +78,17 @@ Tập chứa các nhóm lớp đi cùng với mã lớp mà nhóm lớp đó s�
 
 ## Thuật toán dự định để giải bài toán 
 1. Xét các nhóm phòng học theo sức chứa.
-2. Lấy ra các mã lớp sẽ sử dụng nhóm phòng học đó. (Do trước đó đã có tập các phòng học cùng sức chứa, và đã sắp xếp các mã lớp theo phòng học có sức chứa phù hợp, nên hiện tại những lớp đó có chung phòng học)
-3. Xếp lần lượt các mã lớp vào các phòng học:
--  Xếp lần lượt từng phòng, từng buổi của một phòng, cho đến khi tất cả các  buổi của phòng học đó đã đầy (một phòng được xét là đầy nếu như 'session set' mỗi buổi của phòng đó nằm trong tập "session_set")
+2. Lấy ra các mã lớp sẽ sử dụng nhóm phòng học đó. (Do trước đó đã có tập các phòng học cùng sức chứa, và đã sắp xếp các mã lớp theo phòng học có sức chứa phù hợp, nên hiện tại những lớp đó có chung nhóm phòng học)
+3. Chọn ngẫu nhiên 2 mã lớp từ tập các mã lớp.
+-  Nếu chỉ còn một lớp chưa xếp thì xếp ngay lớp đó vào phòng trống tiếp theo xét.
+-  Nếu tổng số tiết của các mã lớp <= 4 thì chọn thêm một mã lớp nữa (nếu còn mã lớp chứa xếp) sao cho tổng số tiết của các mã lớp == 6 (do số tiết ít nhất là 2 và nhiều nhất là 4).
+5. Sắp xếp các mã lớp 
+-  Xếp các mã lớp đã chọn vào 'used_by' ứng với từng buổi của một phòng, song song với việc thêm vào 'session set' của buổi đó.
+-  Mỗi khi thêm một phòng cũng như thêm vào 'session set' thì sẽ kiểm tra 'session set' nếu nằm trong tập session_set thì buổi đó của lớp đó được xếp xong. Nếu không thể xếp 'session set' thỏa mã thì quay lại chọn bộ khác.
+-  Nếu xếp được thì xóa các lớp đó khỏi danh sách lớp cần xếp, chọn một bộ các mã lớp khác với danh sách lớp sau khi xóa, tiếp tục thực hiện các bước trên với các buổi còn lại của phòng đó.
+-  Đến khi tất cả các buổi của phòng học đó đã đầy (một phòng được xét là đầy nếu như 'session set' mỗi buổi của phòng đó nằm trong tập "session_set") thì ta sẽ xóa phòng đó khỏi danh sách phòng trống.
 -  Khi một phòng đầy thì chuyển sang phòng tiếp theo trong nhóm phòng học có cùng sức chứa với phòng đó.
 -  Nếu như khi xếp hết các buổi của tất cả các phòng trong nhóm phòng học đó mà vẫn còn lớp chưa được xếp thì lớp đó sẽ được lưu vào một danh sách khác để sử dụng một nhóm phòng khác còn trống.
-4. Sau khi đã xếp hết lớp ứng với một nhóm phòng mà nhóm phòng đó vẫn còn thừa chỗ thì những phòng còn chỗ sẽ được lưu vào một danh sách khác.
-5. Xếp những lớp chưa được xếp vào các phòng còn chỗ trống và phù hợp về sức chứa
-       cũng như sĩ số lớp đó.
-6. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu
-       có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ).
+6. Sau khi đã xếp hết lớp ứng với một nhóm phòng mà nhóm phòng đó vẫn còn thừa chỗ thì những phòng còn chỗ sẽ được lưu vào một danh sách khác.
+7. Xếp những lớp chưa được xếp vào các phòng còn chỗ trống và phù hợp về sức chứa cũng như sĩ số lớp đó.
+8. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ).
