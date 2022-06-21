@@ -77,7 +77,8 @@ Tập chứa các nhóm lớp đi cùng với mã lớp mà nhóm lớp đó s�
 #### Còn key "slots" sẽ bao gồm hai tập hợp "used_by" là những phòng học sẽ học tại phòng đó vào buổi có thứ tự đó sau khi sắp xếp 'session set' là tập hợp các tiết học của các lớp được sắp xếp, để so sánh với tập "session_set" 
 ![image](https://user-images.githubusercontent.com/93395558/174737750-52ad1730-1514-493d-b702-2d58fdde8ece.png)
 
-## Thuật toán dự định để giải bài toán 
+## Thuật toán dự định để giải bài toán
+_Thuật toán được thực hiện trên tập classroom_dict_
 1. Xét các nhóm phòng học theo sức chứa.
 2. Lấy ra các mã lớp sẽ sử dụng nhóm phòng học đó. (Do trước đó đã có tập các phòng học cùng sức chứa, và đã sắp xếp các mã lớp theo phòng học có sức chứa phù hợp, nên hiện tại những lớp đó có chung nhóm phòng học)
 3. Chọn ngẫu nhiên 2 mã lớp từ tập các mã lớp.
