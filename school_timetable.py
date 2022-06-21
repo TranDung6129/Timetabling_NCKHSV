@@ -572,19 +572,34 @@ for room in classroom.get_classroom_list():
        
 # Danh sách các phòng đã được xếp đầy chỗ 
 used_room = []
+
+# Kiểm tra xem đã hết phòng sử dụng hay chưa 
+def out_of_room(room):
+    if room_is_full(room, sessioin_full) not in used_room:
+        used_room.append(room)
+    return used_room == 34
+
 # Lấy ra nhóm phòng cùng cỡ và nhóm lớp học các phòng đó 
 def get_room_set(capacity):
     room_set = R_set[capacity]
     return room_set
 
+# Lấy các buổi còn trống của một mã phòng 
+def session_full(room):
+    session_full = []
+    for session in classroom_dict[room]["slots"]:
+        if len(classroom_dict[room]["slots"][session]["session set"]) > 0:
+            session_full.append(session)
+    return session_full 
+
 # Kiểm tra xem một phòng học trong một nhóm phòng nào đó đã xếp đầy hay chưa 
-def room_is_full(room, session_full):
+def room_is_full(room, sessioin_full):
     return len(session_full) == 10
 
 # Kiểm tra xem phòng học đó còn chỗ hay không 
 def room_to_sort(room_set):
     for room in room_set:
-        if not room_is_full(room, session_full):
+        if not room_is_full(room):
             return room
     return "no room left"
 
@@ -617,36 +632,17 @@ def choose_session_for_course_to_sort(room, course_to_sort):
     while len(chosen_session) != session_numbers and sum(periods_total) not in session_set[periods_total]:
         chosen_session = random.choice(session_set)
     return chosen_session
-        
 
-# Thêm mã lớp vào một phòng 
-# def add_course_to_room(room, course_to_sort):
-#     for room in room_set:
-#         # Danh sách chứa các buổi của một phòng nếu buổi đó đã xếp đầy
-#         session_full = []
-#         # Nếu phòng đó chưa xếp đầy tất cả các buổi thì tiếp tục xếp 
-#         if not room_is_full(room, session_full):
-#             for i in range(1, 11):
-#                 # Nếu một buổi chưa đầy thì tiếp tục xếp vào buổi đó 
-#                 if not session_is_full(room, i):
-#                     for __class__ in class_take_part_in:
-#                         room["slots"][i]["used_by"].append(__class__)
-#                         room["slots"][i]["session set"].append((classroom_dict[room_set[0]]["classes"][__class__]))
-            
-        
 # Kiểm tra xem lớp con có bị trùng tiết với lớp ghép hay không
 
-# Kiểm tra xem đã hết phòng sử dụng hay chưa 
-# def out_of_room(room):
-#     if room_is_full(room, day_full) not in used_room:
-#         used_room.append(room)
-#     return used_room == 34
-# Xếp lớp
-# def sort_timetable():
-#     i = 0
-#     while not out_of_room:
-#         pass
-    
+# Xếp các mã lớp vào phòng 
+def add_course_to_room(room, course_to_sort, chosen_session):
+    for session in classroom_dict[room]["slots"]:
+        if len(classroom_dict[room]["slots"][session]["session set"]) == 0:
+            classroom_dict[room]["slots"][session]["session set"] = chosen_session
+        break
+
+
 # expected_timetable = {'Mã lớp': A_set,
 #                       'Lớp tham gia': g_set,
 #                       'Mã_HP': credit_code_list,
