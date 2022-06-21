@@ -34,6 +34,10 @@ Tập chứa các nhóm lớp có ít nhất hai lớp con từ tập G_set
 Tập chứa các nhóm lớp có ít hơn hai lớp con từ tập G_set
 ![image](https://user-images.githubusercontent.com/93395558/174725014-d25be0fd-4316-4458-8f5c-b55a73512715.png)
 
+### Tập G_in_set
+Tập với key là lớp con, value là lớp ghép mà lớp con đó thuộc vào 
+![image](https://user-images.githubusercontent.com/93395558/174874854-0d934b71-d428-4dd9-9847-9228562ee1a6.png)
+
 ## Tập C_set
 Tập hợp chứa tất cả các lớp mở trong kỳ cùng với tên học phần 
 ![image](https://user-images.githubusercontent.com/93395558/174725178-11104224-42b5-49f3-95b5-938e0121d931.png)
