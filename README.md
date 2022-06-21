@@ -72,6 +72,7 @@ Tập chứa các nhóm lớp đi cùng với mã lớp mà nhóm lớp đó s�
 #### Trong đó key "classes" chứa tất cả các mã lớp sẽ học tại phòng đó
 ![image](https://user-images.githubusercontent.com/93395558/174736946-2212959f-a3a0-43c7-8f2b-d385150d7927.png)
 - Bên trong mỗi mã lớp học tại phòng đó, là các phương án chấp nhận được có thể sắp xếp vào thời khóa biểu, gồm tiết bắt đầu và tiết kết thúc của mã lớp đó, tiếp đó 'session' là tuple lưu trữ tiếp bắt đầu và tiết kết thúc của phương án đó, sử dụng để so sánh với tập session_set
+![image](https://user-images.githubusercontent.com/93395558/174744385-8c3d38e4-85ed-4608-8c07-81da7335d40d.png)
 ![image](https://user-images.githubusercontent.com/93395558/174737348-441aa760-a419-4aba-b887-2ba15da56736.png)
 #### Còn key "slots" sẽ bao gồm hai tập hợp "used_by" là những phòng học sẽ học tại phòng đó vào buổi có thứ tự đó sau khi sắp xếp 'session set' là tập hợp các tiết học của các lớp được sắp xếp, để so sánh với tập "session_set" 
 ![image](https://user-images.githubusercontent.com/93395558/174737750-52ad1730-1514-493d-b702-2d58fdde8ece.png)
@@ -92,4 +93,4 @@ Tập chứa các nhóm lớp đi cùng với mã lớp mà nhóm lớp đó s�
 6. Sau khi đã xếp hết lớp ứng với một nhóm phòng mà nhóm phòng đó vẫn còn thừa chỗ thì những phòng còn chỗ sẽ được lưu vào một danh sách khác.
 7. Xếp những lớp chưa được xếp vào các phòng còn chỗ trống và phù hợp về sức chứa cũng như sĩ số lớp đó.
 8. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ).
-## Em sẽ suy nghĩ việc kiểm tra trùng mã lớp con và mã lớp ghép sau ạ, trước mắt thì em muốn xếp được đã rồi mới tính tới
+**Em sẽ suy nghĩ việc kiểm tra trùng mã lớp con và mã lớp ghép sau ạ, trước mắt thì em muốn xếp được đã rồi mới tính tới**
