@@ -339,7 +339,7 @@ def Cg_big_set(Cg_set):
     Cg_big_dict = {}
     for key in Cg_set:
         if len(Cg_set[key]) >= 2:
-            Cg_big_dict.update({key: G_set[key]})
+            Cg_big_dict.update({key: Cg_set[key]})
     return Cg_big_dict
 
 
@@ -348,7 +348,7 @@ def Cg_small_set(Cg_set):
     Cg_small_dict = {}
     for key in Cg_set:
         if len(Cg_set[key]) < 2:
-            Cg_small_dict.update({key: G_set[key]})
+            Cg_small_dict.update({key: Cg_set[key]})
     return Cg_small_dict
 
 
@@ -537,22 +537,22 @@ for room in classroom.get_classroom_list():
             if _class_["class"][0][4] == room:
                 classroom_dict[room]["classes"][course].append(_class_)
 
-""" 1. Xét các nhóm phòng học theo sức chứa.
-    2. Lấy ra các mã lớp sẽ sử dụng nhóm phòng học đó.
-    3. Xếp lần lượt các mã lớp vào các phòng học:
-        3.1. Xếp lần lượt từng phòng, từng buổi một phòng, cho đến khi tất cả các 
-             buổi của phòng học đó đã đầy (so sánh mỗi buổi với session_set)
-        3.2. Khi một phòng đầy thì chuyển sang phòng tiếp theo trong nhóm phòng 
-             học có cùng sức chứa với phòng đó.
-        3.3. Nếu như khi xếp hết các buổi của tất cả các phòng trong nhóm phòng học đó
-             mà vẫn còn lớp chưa được xếp thì lớp đó sẽ được lưu vào một danh sách 
-             khác để sử dụng một nhóm phòng khác còn trống phòng.
-    4. Sau khi đã xếp hết lớp ứng với một nhóm phòng mà nhóm phòng đó vẫn còn thừa chỗ
-       thì những phòng còn chỗ sẽ được lưu vào một danh sách khác.
-    5. Xếp những lớp chưa được xếp vào các phòng còn chỗ trống và phù hợp về sức chứa
-       cũng như sĩ số lớp đó.
-    6. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu
-       có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ). """
+""" 
+1. Xét các nhóm phòng học theo sức chứa.
+2. Lấy ra các mã lớp sẽ sử dụng nhóm phòng học đó. (Do trước đó đã có tập các phòng học cùng sức chứa, và đã sắp xếp các mã lớp theo phòng học có sức chứa phù hợp, nên hiện tại những lớp đó có chung nhóm phòng học)
+3. Chọn ngẫu nhiên 2 mã lớp từ tập các mã lớp.
+-  Nếu tổng số tiết của các mã lớp <= 4 thì chọn thêm một mã lớp nữa sao cho tổng số tiết của các mã lớp == 6 (do số tiết ít nhất là 2 và nhiều nhất là 4)
+4. Sắp xếp các mã lớp 
+-  Xếp các mã lớp đã chọn vào 'used_by' ứng với từng buổi của một phòng, song song với việc thêm vào 'session set' của buổi đó.
+-  Mỗi khi thêm một phòng cũng như thêm vào 'session set' thì sẽ kiểm tra 'session set' nếu nằm trong tập session_set thì buổi đó của lớp đó được xếp xong. Nếu không thể xếp 'session set' thỏa mã thì quay lại chọn bộ khác.
+-  Nếu xếp được thì xóa các lớp đó khỏi danh sách lớp cần xếp, chọn một bộ các mã lớp khác với danh sách lớp sau khi xóa, tiếp tục thực hiện các bước trên với các buổi còn lại của phòng đó.
+-  Đến khi tất cả các buổi của phòng học đó đã đầy (một phòng được xét là đầy nếu như 'session set' mỗi buổi của phòng đó nằm trong tập "session_set") thì ta sẽ xóa phòng đó khỏi danh sách phòng trống.
+-  Khi một phòng đầy thì chuyển sang phòng tiếp theo trong nhóm phòng học có cùng sức chứa với phòng đó.
+-  Nếu như khi xếp hết các buổi của tất cả các phòng trong nhóm phòng học đó mà vẫn còn lớp chưa được xếp thì lớp đó sẽ được lưu vào một danh sách khác để sử dụng một nhóm phòng khác còn trống.
+5. Sau khi đã xếp hết lớp ứng với một nhóm phòng mà nhóm phòng đó vẫn còn thừa chỗ thì những phòng còn chỗ sẽ được lưu vào một danh sách khác.
+6. Xếp những lớp chưa được xếp vào các phòng còn chỗ trống và phù hợp về sức chứa cũng như sĩ số lớp đó.
+7. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ).
+"""
        
 # # Danh sách các phòng đã được xếp đầy chỗ 
 # used_room = []
