@@ -92,3 +92,4 @@ Tập chứa các nhóm lớp đi cùng với mã lớp mà nhóm lớp đó s�
 6. Sau khi đã xếp hết lớp ứng với một nhóm phòng mà nhóm phòng đó vẫn còn thừa chỗ thì những phòng còn chỗ sẽ được lưu vào một danh sách khác.
 7. Xếp những lớp chưa được xếp vào các phòng còn chỗ trống và phù hợp về sức chứa cũng như sĩ số lớp đó.
 8. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ).
+## Em sẽ suy nghĩ việc kiểm tra trùng mã lớp con và mã lớp ghép sau ạ, trước mắt thì em muốn xếp được đã rồi mới tính tới
