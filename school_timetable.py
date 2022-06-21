@@ -199,6 +199,14 @@ G_big_set = G_big_set(G_set)
 # Lấy tập G nhỏ từ tập G
 G_small_set = G_small_set(G_set)
 
+"""# G_in_set 
+Tập hợp có key là lớp đơn, value là lớp ghép mà lớp đơn đó thuộc vào 
+"""
+G_in_set = {}
+for g in G_small_set:
+    for g_big in G_big_set:
+        if G_small_set[g][0] in G_big_set[g_big]:
+            G_in_set[G_small_set[g][0]] = G_big_set[g_big]
 """# C set
 An available set which contains all the courses in the semester
 """
@@ -430,7 +438,7 @@ for key1 in v_dpgcr:
 học tại phòng đó, value2 là số tiết của mã lớp đó"""
 class_dict = {}
 for available_course in available_to_sort:
-    class_dict[available_course[1][3]] = {f"classes": [], "periods:": information.get_class_periods_number(available_course[0][3])} 
+    class_dict[available_course[1][3]] = {f"classes": [], "periods": int(information.get_class_periods_number(available_course[0][3]))} 
 
 for available_set in available_to_sort:
     for course_code in information.get_class_code():
@@ -515,6 +523,14 @@ for i in range(4):
     for session_i in session_set:
         if len(session_i) == 1:
             session_set.remove(session_i)
+            
+session_temp = {4: [], 5: [], 6: []}
+for session_length in session_temp:
+    for session in session_set:
+        if session[1][1] - session[1][0] + session[0][1] - session[0][0] == session_length:
+            session_temp[session_length].append(session)
+
+session_set = session_temp
 ''' Tạo ra dict với key là phòng học, bên trong là dict con chứa các lớp học ở phòng học đó, số tiết 
 mỗi buổi mà phòng đó có thể xếp và phòng học đó đã xếp đủ chỗ hay chưa'''
 classroom_slots = {}
@@ -554,35 +570,62 @@ for room in classroom.get_classroom_list():
 7. Kiểm tra xem các mã lớp con có trùng tiết với các mã lớp ghép hay không, nếu có thì sẽ sắp xếp lại các phòng học và mã lớp đó (hoặc sắp xếp lại toàn bộ).
 """
        
-# # Danh sách các phòng đã được xếp đầy chỗ 
-# used_room = []
+# Danh sách các phòng đã được xếp đầy chỗ 
+used_room = []
+# Lấy ra nhóm phòng cùng cỡ và nhóm lớp học các phòng đó 
+def get_room_set(capacity):
+    room_set = R_set[capacity]
+    return room_set
 
-# # Lấy ra nhóm phòng cùng cỡ và nhóm lớp học các phòng đó 
-# def get_room_set(capacity):
-#     room_set = R_set[capacity]
-#     return room_set
+# Kiểm tra xem một phòng học trong một nhóm phòng nào đó đã xếp đầy hay chưa 
+def room_is_full(room, session_full):
+    return len(session_full) == 10
 
-# def get_class_take_part_in(room_set):
-#     class_take_part_in = []
-#     for _class_ in classroom_dict[room_set[0]]["classes"].keys():
-#         class_take_part_in.append(_class_)
-#     return class_take_part_in 
+# Kiểm tra xem phòng học đó còn chỗ hay không 
+def room_to_sort(room_set):
+    for room in room_set:
+        if not room_is_full(room, session_full):
+            return room
+    return "no room left"
 
-# # Kiểm tra xem một buổi của một lớp nào đó đã đầy hay chưa
-# def session_is_full(room, sess_num):
-#     return room["slots"][sess_num] in session_set 
+def get_course_take_part_in(room_set):
+    course_take_part_in = []
+    for _course_ in classroom_dict[room_set[0]]["classes"].keys():
+        course_take_part_in.append(_course_)
+    return course_take_part_in
+
+# Chọn các mã lớp sẽ xếp vào thời khóa biểu 
+def course_to_sort(course_take_part_in):
+    course_to_sort = random.sample(course_take_part_in, 2)
+    periods_check = []
+    for course in course_to_sort:
+        periods_check.append(class_dict[course]['periods'])
+    while sum(periods_check) < 4:
+        course_take_part_in_temp = [course for course in course_take_part_in if course not in (course_to_sort)]
+        course_to_sort.append(random.choice(course_take_part_in_temp))
+        periods_check.append(class_dict[course_to_sort[2]]['periods'])
+    return course_to_sort
+
+# Chọn session từ session_set theo số lượng các mã lớp tham gia 
+def choose_session_for_course_to_sort(room, course_to_sort):
+    periods_total = []
+    for course in course_to_sort:
+        periods_total.append(class_dict[course]['periods'])
+
+    session_numbers = len(course_to_sort)
+    chosen_session = random.choice(session_set[sum(periods_total)])
+    while len(chosen_session) != session_numbers and sum(periods_total) not in session_set[periods_total]:
+        chosen_session = random.choice(session_set)
+    return chosen_session
         
-# # Kiểm tra xem một phòng học trong một nhóm phòng nào đó đã xếp đầy hay chưa 
-# def room_is_full(room, day_full):
-#     return day_full == 10
 
-# # Thêm mã lớp vào một phòng 
-# def add_course_to_room(room_set, class_take_part_in):
+# Thêm mã lớp vào một phòng 
+# def add_course_to_room(room, course_to_sort):
 #     for room in room_set:
 #         # Danh sách chứa các buổi của một phòng nếu buổi đó đã xếp đầy
-#         day_full = []
+#         session_full = []
 #         # Nếu phòng đó chưa xếp đầy tất cả các buổi thì tiếp tục xếp 
-#         if not room_is_full(room, day_full):
+#         if not room_is_full(room, session_full):
 #             for i in range(1, 11):
 #                 # Nếu một buổi chưa đầy thì tiếp tục xếp vào buổi đó 
 #                 if not session_is_full(room, i):
@@ -591,15 +634,14 @@ for room in classroom.get_classroom_list():
 #                         room["slots"][i]["session set"].append((classroom_dict[room_set[0]]["classes"][__class__]))
             
         
-# # Kiểm tra xem lớp con có bị trùng tiết với lớp ghép hay không
+# Kiểm tra xem lớp con có bị trùng tiết với lớp ghép hay không
 
-# # Kiểm tra xem đã hết phòng sử dụng hay chưa 
+# Kiểm tra xem đã hết phòng sử dụng hay chưa 
 # def out_of_room(room):
-#     global day_full
 #     if room_is_full(room, day_full) not in used_room:
 #         used_room.append(room)
 #     return used_room == 34
-# # Xếp lớp
+# Xếp lớp
 # def sort_timetable():
 #     i = 0
 #     while not out_of_room:
