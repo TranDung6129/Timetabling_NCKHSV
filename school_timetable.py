@@ -661,7 +661,7 @@ def sort_class_to_room_set(capacity):
         add_course_to_room(room, course_to_sort, sort_session, session_set_chosen)
         course_sorted.append(course_to_sort)
         if len(course_take_part_in) <= 1:
-            course_take_part_in.remove(course_to_sort[0])
+            break
         if len(course_take_part_in) > 1:
             course_take_part_in.remove(course_to_sort[0])
             course_take_part_in.remove(course_to_sort[1])
@@ -672,20 +672,9 @@ def sort_class_to_room_set(capacity):
 for capacity in classroom_capacity:
     sort_class_to_room_set(capacity)
     
-# expected_timetable = {'Mã lớp': A_set,
-#                       'Lớp tham gia': g_set,
-#                       'Mã_HP': credit_code_list,
-#                       'Tên HP': credit_name_list,
-#                       'Thứ': study_day_output,
-#                       'BĐ': start_period,
-#                       'KT': end_period,
-#                       'Kíp': study_half_day_output,
-#                       'Sĩ số': class_population_list,
-#                       'Phòng': room_output,
-#                       'Sức chứa': room_capacity_output
-#                       }
 
-# expected_timetable = pd.DataFrame.from_dict(expected_timetable)
+expected_time_table = {}
+pd.DataFrame.from_dict(expected_time_table, orient='tight')
 
 # Tính thời gian chạy 
 end_time= time()
