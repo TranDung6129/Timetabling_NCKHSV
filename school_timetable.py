@@ -737,9 +737,9 @@ def get_end_period(class_code):
 
 data = {}
 for class_code in sorted_course:
-    data[class_code] = [class_code, information.get_class_group(class_code), C_set[class_code]["course_code"], C_set[class_code]["Sub"], get_learning_day(class_code), get_learning_day_part(class_code), information.get_student_number(class_code), get_classroom_used(class_code), classroom.get_classroom_capacity(get_classroom_used(class_code))]
+    data[class_code] = [class_code, information.get_class_group(class_code), C_set[class_code]["course_code"], C_set[class_code]["Sub"], get_learning_day(class_code), get_start_period(class_code), get_end_period(class_code), get_learning_day_part(class_code), information.get_student_number(class_code), get_classroom_used(class_code), classroom.get_classroom_capacity(get_classroom_used(class_code))]
 
-expected_timetable = pd.DataFrame.from_dict(data, orient='index', columns=["Mã lớp", "Lớp tham gia", "Mã HP", "Tên HP", "Thứ", "Kíp", "Sĩ số", "Phòng", "Sức chứa"])
+expected_timetable = pd.DataFrame.from_dict(data, orient='index', columns=["Mã lớp", "Lớp tham gia", "Mã HP", "Tên HP", "Thứ", "BĐ", "KT", "Kíp", "Sĩ số", "Phòng", "Sức chứa"])
 
 # Tính thời gian chạy 
 end_time= time()
