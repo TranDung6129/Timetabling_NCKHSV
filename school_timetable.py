@@ -216,7 +216,7 @@ An available set which contains all the courses in the semester
 def C_set():
     course_dict = {}
     for class_code in information.get_class_code():
-        course_dict[class_code] = {"Sub": information_df.loc[information.get_class_code().index(class_code), 'TÊN HP']}
+        course_dict[class_code] = {"Sub": information_df.loc[information.get_class_code().index(class_code), 'TÊN HP'], "course_code": information_df.loc[information.get_class_code().index(class_code), 'MÃ HP']}
     return course_dict
 
 
@@ -649,7 +649,7 @@ def add_course_to_room(room, course_to_sort, chosen_session, session_set_chosen)
 #     return used_room == len(room_set)
 
 ''' Xếp thời khóa biểu'''
-""" Xếp thời khóa biểu cho từng nhóm phòng theo sức chứa"""
+# Xếp thời khóa biểu cho từng nhóm phòng theo sức chứa
 def sort_class_to_room_set(capacity):
     room_set = get_room_set(capacity)
     course_take_part_in = get_course_take_part_in(room_set)
@@ -671,10 +671,75 @@ def sort_class_to_room_set(capacity):
 
 for capacity in classroom_capacity:
     sort_class_to_room_set(capacity)
-    
 
-expected_time_table = {}
-pd.DataFrame.from_dict(expected_time_table, orient='tight')
+sorted_course = []
+
+def reemovNestings(l):
+    for i in l:
+        if type(i) == list:
+            reemovNestings(i)
+        else:
+            sorted_course.append(i)
+
+reemovNestings(course_sorted)
+"""Xử lý đầu ra"""
+# Lấy phòng lớp đó học 
+def get_classroom_used(class_code):
+    for room in classroom_dict:
+    	for i in range(1, 11):
+    		if class_code in classroom_dict[room]["slots"][i]["used_by"]:
+    			return room 
+
+# Lấy ngày lớp đó học 
+def get_learning_day(class_code):
+    for room in classroom_dict:
+        for day in range(1, 11):
+            if class_code in classroom_dict[room]["slots"][day]["used_by"]:
+                study_day = day
+    if study_day in (1, 2):
+        return 2
+    if study_day in (3, 4):
+        return 3
+    if study_day in (5, 6):
+        return 4
+    if study_day in (7, 8):
+        return 5
+    if study_day in (9, 10):
+        return 6
+
+# Lấy kíp lớp đó học 
+def get_learning_day_part(class_code):
+    for room in classroom_dict:
+        for day in range(1, 11):
+            if class_code in classroom_dict[room]["slots"][day]["used_by"]:
+                study_day = day
+    if study_day in (1, 3, 5, 7, 9):
+        return "Sáng"
+    else: 
+        return "Chiều"
+    
+# Lấy tiết học bắt đầu và kết thúc của mã lớp trong buổi đó
+def get_start_period(class_code):
+    for room in classroom_dict:
+        for day in range(1, 11):
+            if class_code in classroom_dict[room]["slots"][day]["used_by"]:
+                class_index = classroom_dict[room]["slots"][day]["used_by"].index(class_code)
+                start_period = classroom_dict[room]["slots"][day]["session set"][class_index][0]       
+    return start_period
+
+def get_end_period(class_code):
+    for room in classroom_dict:
+        for day in range(1, 11):
+            if class_code in classroom_dict[room]["slots"][day]["used_by"]:
+                class_index = classroom_dict[room]["slots"][day]["used_by"].index(class_code)
+                end_period = classroom_dict[room]["slots"][day]["session set"][class_index][1]       
+    return end_period
+
+data = {}
+for class_code in sorted_course:
+    data[class_code] = [class_code, information.get_class_group(class_code), C_set[class_code]["course_code"], C_set[class_code]["Sub"], get_learning_day(class_code), get_learning_day_part(class_code), information.get_student_number(class_code), get_classroom_used(class_code), classroom.get_classroom_capacity(get_classroom_used(class_code))]
+
+expected_timetable = pd.DataFrame.from_dict(data, orient='index', columns=["Mã lớp", "Lớp tham gia", "Mã HP", "Tên HP", "Thứ", "Kíp", "Sĩ số", "Phòng", "Sức chứa"])
 
 # Tính thời gian chạy 
 end_time= time()
