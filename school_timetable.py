@@ -519,17 +519,24 @@ for i in range(4):
 for i in range(len(session_set)):
     session_set[i] = list(session_set[i])
 # Loại bỏ các bộ chỉ có một phần tử (do số tiết nhỏ hơn hoặc bằng 4 nên một buổi sẽ luôn ít nhất có 2 tiết)
+session_length_1 = []
 for i in range(4):
     for session_i in session_set:
         if len(session_i) == 1:
+            session_length_1.append(session_i)
             session_set.remove(session_i)
             
-session_temp = {4: [], 5: [], 6: []}
-for session_length in session_temp:
+session_temp = {2: [], 3: [], 4: [], 5: [], 6: []}
+for session_length in range(4, 7):
     for session in session_set:
         if session[1][1] - session[1][0] + session[0][1] - session[0][0] == session_length:
             session_temp[session_length].append(session)
-
+            
+for session_length in range(1, 4):
+    for session in session_length_1:
+        if session[0][1] - session[0][0] == session_length:
+            session_temp[session_length].append(session)
+            
 session_set = session_temp
 ''' Tạo ra dict với key là phòng học, bên trong là dict con chứa các lớp học ở phòng học đó, số tiết 
 mỗi buổi mà phòng đó có thể xếp và phòng học đó đã xếp đủ chỗ hay chưa'''
@@ -588,23 +595,25 @@ def get_course_take_part_in(room_set):
 # Chọn ra phòng có thể sử dụng trong nhóm phòng đã chọn
 def room_can_use(room_set):
     for room in room_set:
-        if len(room_available_session(room)) > 0:
+        available_session = []
+        for i in range(1, 11):
+            if len(classroom_dict[room]["slots"][i]["session set"]) == 0:
+                available_session.append(i)
+        if len(available_session) > 0:
             return room
-        
-# Tìm ra buổi học còn trống của mã lớp đó 
+# Kiểm tra xem phòng đó còn buổi trống hay không 
 def room_available_session(room):
     available_session = []
     for i in range(1, 11):
         if len(classroom_dict[room]["slots"][i]["session set"]) == 0:
             available_session.append(i)
     return available_session
-        
 # Chọn các mã lớp sẽ xếp vào thời khóa biểu
 def get_course_to_sort(course_take_part_in):
-    if len(course_take_part_in) >= 3:
-        course_to_sort = course_take_part_in[0:2]
-    else: 
-        course_to_sort = course_take_part_in[0:-1]
+    if len(course_take_part_in) >= 2:
+        course_to_sort = course_to_sort = random.sample(course_take_part_in, 2)
+    elif len(course_take_part_in) == 1:
+        course_to_sort = course_take_part_in
     return course_to_sort
 
 # Chia mã lớp thành các nhóm 2-3 lớp con thỏa mãn số lượng tiết trong một buổi
@@ -614,10 +623,15 @@ def choose_sort_session(room):
             return i
 
 # Chọn session từ session_set theo số lượng các mã lớp tham gia 
-def choose_session_set_for_course(course_to_sort):
+def choose_session_set_for_course(course_to_sort, course_take_part_in):
     periods_chosen_course = []
     for course in course_to_sort:
         periods_chosen_course.append(class_dict[course]["periods"])
+    while sum(periods_chosen_course) > 6:
+        periods_chosen_course = []
+        course_to_sort = random.sample(course_take_part_in, 2)
+        for course in course_to_sort:
+            periods_chosen_course.append(class_dict[course]["periods"])
     session_set_chosen = random.choice(session_set[sum(periods_chosen_course)])
     return session_set_chosen
 
@@ -627,7 +641,7 @@ def check_small_group_in_big_group():
 
 # Xếp các mã lớp vào phòng 
 def add_course_to_room(room, course_to_sort, chosen_session, session_set_chosen):
-    classroom_dict[room]["slots"][chosen_session]["used by"] = course_to_sort
+    classroom_dict[room]["slots"][chosen_session]["used_by"] = course_to_sort
     classroom_dict[room]["slots"][chosen_session]["session set"] = session_set_chosen 
     
 # Kiểm tra xem đã hết phòng sử dụng hay chưa 
@@ -636,30 +650,28 @@ def add_course_to_room(room, course_to_sort, chosen_session, session_set_chosen)
 
 ''' Xếp thời khóa biểu'''
 """ Xếp thời khóa biểu cho từng nhóm phòng theo sức chứa"""
-room_set = get_room_set(32)
-course_take_part_in = get_course_take_part_in(room_set)
-while len(course_take_part_in) != 0 and len(room_set) != 0:
-    room = room_can_use(room_set)
-    course_to_sort = get_course_to_sort(course_take_part_in)
-    sort_session = choose_sort_session(room)
-    session_set_chosen = choose_session_set_for_course(course_to_sort)
-    add_course_to_room(room, course_to_sort, sort_session, session_set_chosen)
-    course_sorted.append(course_to_sort)
-    course_take_part_in.remove(course_to_sort[0])
-    course_take_part_in.remove(course_to_sort[0])
-    if room_available_session(room) == 0:
-        used_room.append(room)
-        room_set.remove(room)
-# def sort_timetable_for_room_set(capacity):
-#     room_set = get_room_set(capacity)
-#     course_take_part_in = get_course_take_part_in(room_set)
-#     room = room_to_sort(room_set)
-#     while room_is_full(room) == False:
-#         course_to_sort = course_to_sort(course_take_part_in)
-#         chosen_session = choose_session_for_course_to_sort(room, course_to_sort)
-#         add_course_to_room(room, course_to_sort, chosen_session)
+def sort_class_to_room_set(capacity):
+    room_set = get_room_set(capacity)
+    course_take_part_in = get_course_take_part_in(room_set)
+    while len(course_take_part_in) != 0 and len(room_set) != 0:
+        room = room_can_use(room_set)
+        course_to_sort = get_course_to_sort(course_take_part_in)
+        sort_session = choose_sort_session(room)
+        session_set_chosen = choose_session_set_for_course(course_to_sort)
+        add_course_to_room(room, course_to_sort, sort_session, session_set_chosen)
+        course_sorted.append(course_to_sort)
+        if len(course_take_part_in) <= 1:
+            course_take_part_in.remove(course_to_sort[0])
+        if len(course_take_part_in) > 1:
+            course_take_part_in.remove(course_to_sort[0])
+            course_take_part_in.remove(course_to_sort[1])
+        if room_available_session(room) == 0:
+            used_room.append(room)
+            room_set.remove(room)
 
-
+for capacity in classroom_capacity:
+    sort_class_to_room_set(capacity)
+    
 # expected_timetable = {'Mã lớp': A_set,
 #                       'Lớp tham gia': g_set,
 #                       'Mã_HP': credit_code_list,
