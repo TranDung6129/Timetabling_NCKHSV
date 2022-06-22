@@ -611,13 +611,13 @@ def room_available_session(room):
 # Chọn các mã lớp sẽ xếp vào thời khóa biểu
 def get_course_to_sort(course_take_part_in):
     if len(course_take_part_in) >= 2:
-        course_to_sort = course_to_sort = random.sample(course_take_part_in, 2)
+        course_to_sort = random.sample(course_take_part_in, 2)
     elif len(course_take_part_in) == 1:
         course_to_sort = course_take_part_in
     return course_to_sort
 
 # Chia mã lớp thành các nhóm 2-3 lớp con thỏa mãn số lượng tiết trong một buổi
-def choose_sort_session(room):
+def choose_sort_day(room):
     for i in range(1, 11):
         if len(classroom_dict[room]["slots"][i]["session set"]) == 0:
             return i
@@ -656,8 +656,8 @@ def sort_class_to_room_set(capacity):
     while len(course_take_part_in) != 0 and len(room_set) != 0:
         room = room_can_use(room_set)
         course_to_sort = get_course_to_sort(course_take_part_in)
-        sort_session = choose_sort_session(room)
-        session_set_chosen = choose_session_set_for_course(course_to_sort)
+        sort_session = choose_sort_day(room)
+        session_set_chosen = choose_session_set_for_course(course_to_sort, course_take_part_in)
         add_course_to_room(room, course_to_sort, sort_session, session_set_chosen)
         course_sorted.append(course_to_sort)
         if len(course_take_part_in) <= 1:
